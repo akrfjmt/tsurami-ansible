@@ -76,7 +76,7 @@
     chdir: "{{ NGINX_SRC_DIR }}"
     target: install
   when: nginx_build.changed
-  register: nginx_install
+  notify: restart nginx
 
 - name: Set nginx symbolic link
   file:
