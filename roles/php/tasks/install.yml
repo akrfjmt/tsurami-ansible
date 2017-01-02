@@ -1,0 +1,17 @@
+- name: Copy php tarball
+  copy:
+    src: "{{ PHP_VERSION }}.tar.gz"
+    dest: "{{ SRC_DIR }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Decompress php tarball
+  unarchive:
+    src: "{{ SRC_DIR }}/{{ PHP_VERSION }}.tar.gz"
+    dest: "{{ SRC_DIR }}"
+    copy: no
+    group: root
+    owner: root
+    mode: "0755"
+

@@ -1,0 +1,95 @@
+---
+- name: Add nginx group
+  group:
+    name: "{{ NGINX_USER }}"
+    gid: "{{ NGINX_USER_GID }}"
+
+- name: Add nginx user
+  user:
+    name: "{{ NGINX_USER }}"
+    uid: "{{ NGINX_USER_UID }}"
+    group: "{{ NGINX_USER }}"
+    system: yes
+    shell: /sbin/nologin
+
+- name: Create nginx temp directory
+  file:
+    path: "{{ NGINX_TEMP_DIR }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create nginx log directory
+  file:
+    path: "{{ NGINX_LOG_DIR }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Copy nginx tarball
+  copy:
+    src: "{{ NGINX_VERSION }}.tar.gz"
+    dest: "{{ SRC_DIR }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Decompress nginx tarball
+  unarchive:
+    src: "{{ SRC_DIR }}/{{ NGINX_VERSION }}.tar.gz"
+    remote_src: yes
+    dest: "{{ SRC_DIR }}"
+    group: root
+    owner: root
+    mode: "0755"
+
+- name: Install nginx dependency packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ NGINX_DEPENDENCY_PACKAGES_APT }}"
+
+- name: Check nginx compilation flangs
+  template:
+    src: .nginx_compilation_flags.j2
+    dest: "{{ NGINX_SRC_DIR }}/.nginx_compilation_flags"
+  register: nginx_compilation_flags
+
+- name: Run nginx configure script
+  command: >
+    ./configure
+    {{ NGINX_CONFIGURE_OPTIONS | join(" ") }}
+  args:
+    chdir: "{{ NGINX_SRC_DIR }}"
+  when: nginx_compilation_flags.changed
+
+- name: Build nginx
+  make:
+    chdir: "{{ NGINX_SRC_DIR }}"
+    target: build
+  register: nginx_build
+
+- name: Install nginx
+  make:
+    chdir: "{{ NGINX_SRC_DIR }}"
+    target: install
+  when: nginx_build.changed
+  register: nginx_install
+
+- name: Set nginx symbolic link
+  file:
+    src: /usr/local/nginx/sbin/nginx
+    dest: /usr/sbin/nginx
+    owner: root
+    group: root
+    state: link
+
+- name: Copy nginx systemd script
+  copy:
+    src: nginx.service
+    dest: /lib/systemd/system
+    owner: root
+    group: root
+    mode: 644

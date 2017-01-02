@@ -1,0 +1,79 @@
+---
+# 参照: http://dev.mysql.com/doc/refman/5.7/en/binary-installation.html
+
+- group:
+    name: "{{ MYSQL_GROUP }}"
+    gid: "{{ MYSQL_USER_GID }}"
+
+- user:
+    name: "{{ MYSQL_USER }}"
+    uid: "{{ MYSQL_USER_UID }}"
+    group: "{{ MYSQL_USER }}"
+    system: yes
+    shell: /sbin/nologin
+
+# Ansible 2.2.0のcopyモジュールは巨大ファイルを扱えない。MemoryErrorになる。
+#- name: Copy mysql tarball
+#  copy:
+#    src: "{{ MYSQL_BASENAME }}.tar.gz"
+#    dest: "{{ SRC_DIR }}"
+#    mode: "0644"
+#    owner: root
+#    group: root
+
+- synchronize:
+    src: "{{ role_path }}/files/{{ MYSQL_BASENAME }}.tar.gz"
+    dest: "{{ SRC_DIR }}/{{ MYSQL_BASENAME }}.tar.gz"
+
+- file:
+    path: "{{ SRC_DIR }}/{{ MYSQL_BASENAME }}.tar.gz"
+    mode: "0644"
+    state: file
+
+# TODO: unarchiveモジュールの出すchangedを抑制する
+- unarchive:
+    src: "{{ SRC_DIR }}/{{ MYSQL_BASENAME }}.tar.gz"
+    dest: "{{ INSTALL_DIR }}"
+    remote_src: yes
+
+- file:
+    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
+    mode: "0755"
+    owner: "{{ MYSQL_USER }}"
+    group: "{{ MYSQL_GROUP }}"
+    recurse: yes
+
+- file:
+    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}/mysql-files"
+    mode: "0750"
+    owner: "{{ MYSQL_USER }}"
+    group: "{{ MYSQL_GROUP }}"
+    state: directory
+
+- file:
+    src: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
+    dest: "{{ INSTALL_DIR }}/mysql"
+    owner: "{{ MYSQL_USER }}"
+    group: "{{ MYSQL_GROUP }}"
+    state: link
+
+- command: "{{ INSTALL_DIR }}/mysql/bin/mysqld --initialize --user=mysql"
+- command: "{{ INSTALL_DIR }}/mysql/bin/mysql_ssl_rsa_setup"
+
+- file:
+    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
+    owner: root
+    group: root
+    recurse: yes
+
+- file:
+    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}/data"
+    owner: root
+    group: root
+    recurse: yes
+
+- file:
+    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}/mysql-files"
+    owner: "{{ MYSQL_USER }}"
+    group: "{{ MYSQL_GROUP }}"
+    recurse: yes

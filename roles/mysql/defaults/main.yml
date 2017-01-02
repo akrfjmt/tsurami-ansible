@@ -1,0 +1,2 @@
+MYSQL_VERSION: mysql-5.7.16
+MYSQL_BASENAME: "{{ MYSQL_VERSION }}-linux-glibc2.5-x86_64"
