@@ -2,4 +2,14 @@ MYSQL_DEB_BUNDLE_BASENAME: mysql-server_5.7.17-1ubuntu16.04_amd64.deb-bundle
 
 MYSQL_DEPENDENCY_PACKAGES:
   - libaio1
+  - libnuma1
+  - psmisc
+  - libmecab2
+  - libnuma1
 
+MYSQL_DEBS:
+  - mysql-common_5.7.17-1ubuntu16.04_amd64.deb
+  - mysql-community-client_5.7.17-1ubuntu16.04_amd64.deb
+  - mysql-client_5.7.17-1ubuntu16.04_amd64.deb
+  - mysql-community-server_5.7.17-1ubuntu16.04_amd64.deb
+  - mysql-server_5.7.17-1ubuntu16.04_amd64.deb
