@@ -1,0 +1,25 @@
+---
+# 参照: https://dev.mysql.com/doc/refman/5.7/en/linux-installation-debian.html
+
+- name: Install mysql dependency packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ MYSQL_DEPENDENCY_PACKAGES }}"
+
+- name: Upload mysql tarball
+  synchronize:
+    src: "{{ role_path }}/files/{{ MYSQL_DEB_BUNDLE_BASENAME }}.tar"
+    dest: "{{ SRC_DIR }}/{{ MYSQL_DEB_BUNDLE_BASENAME }}.tar"
+
+- name: Unarchive mysql tarball
+  unarchive:
+    remote_src: yes
+    src: "{{ SRC_DIR }}/{{ MYSQL_DEB_BUNDLE_BASENAME }}.tar"
+    dest: "{{ SRC_DIR }}"
+  register: mysql_unarchive_flags
+
+- name: Initialize mysql
+  command: "dpkg -i {{ SRC_DIR }}/mysql-common_5.7.17-1ubuntu16.04_amd64.deb"
+  when: mysql_unarchive_flags.changed
+

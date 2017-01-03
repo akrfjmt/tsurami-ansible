@@ -1,0 +1,5 @@
+MYSQL_DEB_BUNDLE_BASENAME: mysql-server_5.7.17-1ubuntu16.04_amd64.deb-bundle
+
+MYSQL_DEPENDENCY_PACKAGES:
+  - libaio1
+

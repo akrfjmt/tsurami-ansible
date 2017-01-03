@@ -40,15 +40,15 @@ Playbookの実行に必要なtarballをそれぞれ以下のパスに配置す�
 tsurami-localにpythonをインストールする。
 
 ```bash
-sudo apt install -y python
+apt install -y python
 ```
 
 tsurami-controlにansibleをインストールする。
 
 ```bash
-sudo apt-add-repository ppa:ansible/ansible
-sudo apt update
-sudo apt install -y ansible=2.2.0.0*
+apt-add-repository -y ppa:ansible/ansible
+apt update
+apt install -y ansible=2.2.0.0*
 ```
 
 ### 4. playbook実行
@@ -57,5 +57,5 @@ tsurami-controlでplaybookを実行する。
 
 ```bash
 cd /home/tsurami-ansible
-ansible-playbook -i inventories/local_hosts.ini playbooks/tsu-local.yml
+ansible-playbook -i inventories/local_hosts.ini playbooks/tsurami-local.yml
 ```

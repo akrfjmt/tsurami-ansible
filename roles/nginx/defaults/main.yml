@@ -2,7 +2,7 @@
 NGINX_VERSION: nginx-1.11.8
 NGINX_SRC_DIR: "{{ SRC_DIR }}/{{ NGINX_VERSION }}"
 
-NGINX_PREFIX: /usr/local/nginx
+NGINX_PREFIX: "{{ INSTALL_DIR }}/nginx"
 NGINX_CONF_PATH: "{{ NGINX_PREFIX }}/conf/nginx.conf"
 NGINX_LOG_DIR: /var/log/nginx
 NGINX_TEMP_DIR: /var/lib/nginx

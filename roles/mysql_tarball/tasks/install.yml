@@ -1,0 +1,99 @@
+---
+# 参照: http://dev.mysql.com/doc/refman/5.7/en/binary-installation.html
+
+- name: Install mysql dependency packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ MYSQL_DEPENDENCY_PACKAGES }}"
+
+- name: Create mysql group
+  group:
+    name: "{{ MYSQL_GROUP }}"
+    gid: "{{ MYSQL_USER_GID }}"
+
+- name: Create mysql user
+  user:
+    name: "{{ MYSQL_USER }}"
+    uid: "{{ MYSQL_USER_UID }}"
+    group: "{{ MYSQL_USER }}"
+    system: yes
+    shell: /sbin/nologin
+
+- name: Upload mysql tarball
+  synchronize:
+    src: "{{ role_path }}/files/{{ MYSQL_BASENAME }}.tar.gz"
+    dest: "{{ SRC_DIR }}/{{ MYSQL_BASENAME }}.tar.gz"
+
+## 本当はこう書きたいが、Ansible 2.2.0.0のcopyモジュールは巨大ファイルを扱えない。MemoryErrorになる。
+#- name: Copy mysql tarball
+#  copy:
+#    src: "{{ MYSQL_BASENAME }}.tar.gz"
+#    dest: "{{ SRC_DIR }}"
+#    mode: "0644"
+#    owner: root
+#    group: root
+
+## ミラーから直接ダウンロードする場合はこう
+#- name: Download mysql tarball from jaist
+#  get_url:
+#    url: "ftp://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL-5.7/{{ MYSQL_BASENAME }}.tar.gz"
+#    dest: "{{ SRC_DIR }}/{{ MYSQL_BASENAME }}.tar.gz"
+#    checksum: md5:48c96aac2565f7145ff4dcaabdfce2a3
+
+- name: Unarchive mysql tarball
+  unarchive:
+    remote_src: yes
+    src: "{{ SRC_DIR }}/{{ MYSQL_BASENAME }}.tar.gz"
+    dest: "{{ INSTALL_DIR }}"
+    creates: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
+  register: mysql_unarchive_flags
+
+- name: Create mysql symbolic link
+  file:
+    src: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
+    dest: "{{ MYSQL_PREFIX }}"
+    state: link
+  when: mysql_unarchive_flags.changed
+
+- name: Create mysql-files directory
+  file:
+    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}/mysql-files"
+    mode: "0750"
+    state: directory
+  when: mysql_unarchive_flags.changed
+
+- name: Change mysql directory filemode
+  file:
+    recurse: yes
+    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
+    owner: "{{ MYSQL_USER }}"
+    group: "{{ MYSQL_GROUP }}"
+  when: mysql_unarchive_flags.changed
+
+- name: Initialize mysql
+  command: "{{ MYSQL_PREFIX }}/bin/mysqld --initialize-insecure --user=mysql"
+  when: mysql_unarchive_flags.changed
+
+- name: Execute mysql_ssl_rsa_setup
+  command: "{{ MYSQL_PREFIX }}/bin/mysql_ssl_rsa_setup"
+  when: mysql_unarchive_flags.changed
+
+- name: Change mysql directory owner to root
+  file:
+    recurse: yes
+    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
+    owner: root
+    group: root
+  when: mysql_unarchive_flags.changed
+
+- name: Change mysql directory owner to mysql
+  file:
+    recurse: yes
+    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}/{{ item }}"
+    owner: "{{ MYSQL_USER }}"
+    group: "{{ MYSQL_GROUP }}"
+  with_items:
+    - data
+    - mysql-files
+  when: mysql_unarchive_flags.changed

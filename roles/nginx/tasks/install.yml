@@ -1,4 +1,10 @@
 ---
+- name: Install nginx dependency packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ NGINX_DEPENDENCY_PACKAGES_APT }}"
+
 - name: Add nginx group
   group:
     name: "{{ NGINX_USER }}"
@@ -44,12 +50,6 @@
     group: root
     owner: root
     mode: "0755"
-
-- name: Install nginx dependency packages
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ NGINX_DEPENDENCY_PACKAGES_APT }}"
 
 - name: Check nginx compilation flangs
   template:
