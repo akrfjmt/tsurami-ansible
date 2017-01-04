@@ -31,9 +31,8 @@ Playbookの実行に必要なtarballをそれぞれ以下のパスに配置す�
 
 | 項目  | ファイルパス                                                                  |
 |-------|-------------------------------------------------------------------------------|
-| nginx | `tsurami-ansible/roles/nginx/files/nginx-1.11.8.tar.gz`                       |
 | MySQL | `tsurami-ansible/roles/mysql/files/mysql-5.7.16-linux-glibc2.5-x86_64.tar.gz` |
-| PHP   | `tsurami-ansible/roles/mysql/files/mysql-5.7.16-linux-glibc2.5-x86_64.tar.gz` |
+| nginx | `tsurami-ansible/roles/nginx/files/nginx-1.11.8.tar.gz`                       |
 
 ### 3. 必要なソフトウェアのインストール
 

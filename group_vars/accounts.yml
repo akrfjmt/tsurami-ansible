@@ -1,5 +1,4 @@
 ---
-# Webサーバのユーザは600番台
 NGINX_USER: nginx
 NGINX_GROUP: nginx
 NGINX_USER_UID: 601

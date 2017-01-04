@@ -1,4 +1,4 @@
 *.tar.gz
+*.tar
 .idea
 tsurami-ansible.iml
-roles/mysql_deb/files/mysql-server_5.7.17-1ubuntu16.04_amd64.deb-bundle.tar
