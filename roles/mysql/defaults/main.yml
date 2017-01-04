@@ -1,7 +1,7 @@
-MYSQL_VERSION: mysql-5.7.16
+MYSQL_VERSION: mysql-5.7.17
 MYSQL_BASENAME: "{{ MYSQL_VERSION }}-linux-glibc2.5-x86_64"
 
-MYSQL_PREFIX: /usr/local/mysql
+MYSQL_PREFIX: "{{ INSTALL_DIR }}/mysql"
 
 MYSQL_DEPENDENCY_PACKAGES:
   - libaio1

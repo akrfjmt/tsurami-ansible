@@ -49,7 +49,7 @@
     creates: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
   register: mysql_unarchive_flags
 
-- name: Create mysql symbolic link
+- name: Create mysql directory symbolic link
   file:
     src: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
     dest: "{{ MYSQL_PREFIX }}"
@@ -97,3 +97,57 @@
     - data
     - mysql-files
   when: mysql_unarchive_flags.changed
+
+- name: Copy mysqld.service for systemd
+  copy:
+    src: mysqld.service
+    dest: /etc/systemd/system
+    owner: root
+    group: root
+    mode: 644
+  when: mysql_unarchive_flags.changed
+
+- name: Create mysql symbolic link
+  file:
+    src: "{{ MYSQL_PREFIX }}/bin/{{ item }}"
+    dest: "{{ BIN_DIR }}/{{ item }}"
+    state: link
+  with_items:
+    - innochecksum
+    - lz4_decompress
+    - myisamchk
+    - myisam_ftdump
+    - myisamlog
+    - myisampack
+    - my_print_defaults
+    - mysql
+    - mysqladmin
+    - mysqlbinlog
+    - mysqlcheck
+    - mysql_client_test_embedded
+    - mysql_config
+    - mysql_config_editor
+    - mysqld
+    - mysqld-debug
+    - mysqld_multi
+    - mysqld_safe
+    - mysqldump
+    - mysqldumpslow
+    - mysql_embedded
+    - mysqlimport
+    - mysql_install_db
+    - mysql_plugin
+    - mysqlpump
+    - mysql_secure_installation
+    - mysqlshow
+    - mysqlslap
+    - mysql_ssl_rsa_setup
+    - mysqltest_embedded
+    - mysql_tzinfo_to_sql
+    - mysql_upgrade
+    - mysqlxtest
+    - perror
+    - replace
+    - resolveip
+    - resolve_stack_dump
+    - zlib_decompress

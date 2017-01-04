@@ -1,4 +1,5 @@
 ---
 INSTALL_DIR: /usr/local
 SRC_DIR: /usr/local/src
+BIN_DIR: /usr/local/bin
 

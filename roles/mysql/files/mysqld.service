@@ -1,0 +1,14 @@
+[Unit]
+Description=MySQL Server
+After=syslog.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/mysql/bin/mysqld --user=mysql
+TimeoutSec=300
+User=mysql
+Group=mysql
+
+[Install]
+WantedBy=multi-user.target
