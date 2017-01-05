@@ -4,15 +4,13 @@ tsurami.com個人開発環境を構築するためのPlaybook
 
 ## 行うこと
 
-### できていること
-
-* nginxのインストール
+* nginxをビルドしてインストール
+* MYSQLをtarballからインストール
 
 ### TODO
 
-* MYSQLのインストール
-* PHPのインストール
-* SSLの設定
+* PHPをビルドしてインストール
+* SSLを設定
 
 ## 利用手順
 

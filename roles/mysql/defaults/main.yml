@@ -6,3 +6,42 @@ MYSQL_PREFIX: "{{ INSTALL_DIR }}/mysql"
 MYSQL_DEPENDENCY_PACKAGES:
   - libaio1
 
+MYSQL_COMMANDS:
+  - innochecksum
+  - lz4_decompress
+  - myisamchk
+  - myisam_ftdump
+  - myisamlog
+  - myisampack
+  - my_print_defaults
+  - mysql
+  - mysqladmin
+  - mysqlbinlog
+  - mysqlcheck
+  - mysql_client_test_embedded
+  - mysql_config
+  - mysql_config_editor
+  - mysqld
+  - mysqld-debug
+  - mysqld_multi
+  - mysqld_safe
+  - mysqldump
+  - mysqldumpslow
+  - mysql_embedded
+  - mysqlimport
+  - mysql_install_db
+  - mysql_plugin
+  - mysqlpump
+  - mysql_secure_installation
+  - mysqlshow
+  - mysqlslap
+  - mysql_ssl_rsa_setup
+  - mysqltest_embedded
+  - mysql_tzinfo_to_sql
+  - mysql_upgrade
+  - mysqlxtest
+  - perror
+  - replace
+  - resolveip
+  - resolve_stack_dump
+  - zlib_decompress
