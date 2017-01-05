@@ -58,9 +58,7 @@
   register: nginx_compilation_flags
 
 - name: Run nginx configure script
-  command: >
-    ./configure
-    {{ NGINX_CONFIGURE_OPTIONS | join(" ") }}
+  command: "./configure {{ NGINX_CONFIGURE_OPTIONS | join(' ') }}"
   args:
     chdir: "{{ NGINX_SRC_DIR }}"
   when: nginx_compilation_flags.changed

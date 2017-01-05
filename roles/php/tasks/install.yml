@@ -15,3 +15,19 @@
     owner: root
     mode: "0755"
 
+- name: Run php configure script
+  command: "./configure {{ PHP_CONFIGURE_OPTIONS | join(' ') }}"
+  args:
+    chdir: "{{ PHP_SRC_DIR }}"
+
+- name: Build php
+  make:
+    chdir: "{{ PHP_SRC_DIR }}"
+    target: build
+  register: php_build
+
+- name: Install php
+  make:
+    chdir: "{{ PHP_SRC_DIR }}"
+    target: install
+  when: php_build.changed

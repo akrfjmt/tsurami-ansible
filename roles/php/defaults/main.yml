@@ -1,10 +1,14 @@
 PHP_VERSION: php-7.1.0
-PHP_SRC_DIR: "{{ SRC_DIR }}/{{ NGINX_VERSION }}"
+PHP_SRC_DIR: "{{ SRC_DIR }}/{{ PHP_VERSION }}"
 
 PHP_DEPENDENCY_PACKAGES_APT:
-  - libpcre3-dev
-  - libssl-dev
-  - libxslt1-dev
-  - libgd-dev
-  - libgeoip-dev
+  - libxml2-dev
 
+PHP_CONFIGURE_OPTIONS:
+  - --prefix=/usr/local/php
+  - --enable-phpdbg
+  - --enable-fpm
+  - --with-fpm-user=nobody
+  - --with-fpm-group=nobody
+  - --disable-cgi
+  - --with-pdo-mysql=mysqlnd
