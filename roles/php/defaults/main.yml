@@ -8,7 +8,6 @@ PHP_CONFIGURE_OPTIONS:
   - --prefix=/usr/local/php
   - --enable-phpdbg
   - --enable-fpm
-  - --with-fpm-user=nobody
-  - --with-fpm-group=nobody
+  - --enable-mbstring
   - --disable-cgi
   - --with-pdo-mysql=mysqlnd
