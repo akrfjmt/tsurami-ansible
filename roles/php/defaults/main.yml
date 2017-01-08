@@ -1,5 +1,6 @@
 PHP_VERSION: php-7.1.0
 PHP_SRC_DIR: "{{ SRC_DIR }}/{{ PHP_VERSION }}"
+PHP_PREFIX: "{{ INSTALL_DIR }}/php"
 
 PHP_DEPENDENCY_PACKAGES_APT:
   - libxml2-dev
@@ -8,6 +9,19 @@ PHP_CONFIGURE_OPTIONS:
   - --prefix=/usr/local/php
   - --enable-phpdbg
   - --enable-fpm
-  - --enable-mbstring
   - --disable-cgi
   - --with-pdo-mysql=mysqlnd
+
+PHP_BIN_ENTRIES:
+  - pear
+  - peardev
+  - pecl
+  - phar
+  - phar.phar
+  - php
+  - php-config
+  - phpdbg
+  - phpize
+
+PHP_SBIN_ENTRIES:
+  - php-fpm

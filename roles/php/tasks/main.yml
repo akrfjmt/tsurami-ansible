@@ -1,2 +1,3 @@
 ---
 - include: install.yml
+- include: php-fpm.yml

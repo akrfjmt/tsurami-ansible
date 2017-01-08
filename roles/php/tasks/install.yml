@@ -1,3 +1,4 @@
+---
 - name: Copy php tarball
   copy:
     src: "{{ PHP_VERSION }}.tar.gz"
@@ -15,15 +16,23 @@
     owner: root
     mode: "0755"
 
+- name: Check php compilation flangs
+  template:
+    src: .php_compilation_flags.j2
+    dest: "{{ PHP_SRC_DIR }}/.php_compilation_flags"
+  register: php_compilation_flags
+
 - name: Run php configure script
   command: "./configure {{ PHP_CONFIGURE_OPTIONS | join(' ') }}"
   args:
     chdir: "{{ PHP_SRC_DIR }}"
+  when: php_compilation_flags.changed
 
 - name: Build php
   make:
     chdir: "{{ PHP_SRC_DIR }}"
-    target: build
+    target: all
+  when: php_compilation_flags.changed
   register: php_build
 
 - name: Install php
@@ -31,3 +40,24 @@
     chdir: "{{ PHP_SRC_DIR }}"
     target: install
   when: php_build.changed
+
+- name: Set php.ini
+  template:
+    src: php.ini-development.j2
+    dest: /usr/local/php/lib/php.ini
+
+- name: Create php bin entries symlink
+  file:
+    src: "{{ PHP_PREFIX }}/bin/{{ item }}"
+    dest: "{{ BIN_DIR }}/{{ item }}"
+    state: link
+  with_items: "{{ PHP_BIN_ENTRIES }}"
+
+- name: Create php sbin entries symlink
+  file:
+    src: "{{ PHP_PREFIX }}/sbin/{{ item }}"
+    dest: "{{ SBIN_DIR }}/{{ item }}"
+    state: link
+  with_items: "{{ PHP_SBIN_ENTRIES }}"
+
+

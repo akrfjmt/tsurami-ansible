@@ -6,7 +6,7 @@ MYSQL_PREFIX: "{{ INSTALL_DIR }}/mysql"
 MYSQL_DEPENDENCY_PACKAGES:
   - libaio1
 
-MYSQL_COMMANDS:
+MYSQL_BIN_ENTRIES:
   - innochecksum
   - lz4_decompress
   - myisamchk

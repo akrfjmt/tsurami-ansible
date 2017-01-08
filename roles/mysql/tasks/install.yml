@@ -106,10 +106,10 @@
     state: link
   when: mysql_unarchive_flags.changed
 
-- name: Create mysql commands symlink
+- name: Create mysql bin entries symlink
   file:
     src: "{{ MYSQL_PREFIX }}/bin/{{ item }}"
     dest: "{{ BIN_DIR }}/{{ item }}"
     state: link
-  with_items: "{{ MYSQL_COMMANDS }}"
+  with_items: "{{ MYSQL_BIN_ENTRIES }}"
   when: mysql_unarchive_flags.changed

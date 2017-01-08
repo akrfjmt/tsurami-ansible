@@ -1,0 +1,13 @@
+---
+- name: Add nginx group
+  group:
+    name: "{{ NGINX_USER }}"
+    gid: "{{ NGINX_USER_GID }}"
+
+- name: Add nginx user
+  user:
+    name: "{{ NGINX_USER }}"
+    uid: "{{ NGINX_USER_UID }}"
+    group: "{{ NGINX_USER }}"
+    system: yes
+    shell: /sbin/nologin
