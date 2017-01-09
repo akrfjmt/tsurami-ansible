@@ -1,4 +1,4 @@
 *.tar.gz
-*.tar
+*.phar
 .idea
 tsurami-ansible.iml
