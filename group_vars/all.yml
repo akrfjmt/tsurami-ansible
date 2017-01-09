@@ -1,5 +1,5 @@
 ---
-INSTALL_DIR: /usr/local
+PREFIX: /usr/local
 SRC_DIR: /usr/local/src
 BIN_DIR: /usr/local/bin
 SBIN_DIR: /usr/local/sbin

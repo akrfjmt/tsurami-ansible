@@ -1,50 +1,44 @@
 ---
 - name: Copy php tarball
   copy:
-    src: "{{ PHP_VERSION }}.tar.gz"
+    src: "{{ PHP_BASENAME }}.tar.gz"
     dest: "{{ SRC_DIR }}"
-    owner: root
-    group: root
-    mode: "0644"
 
 - name: Decompress php tarball
   unarchive:
-    src: "{{ SRC_DIR }}/{{ PHP_VERSION }}.tar.gz"
+    src: "{{ SRC_DIR }}/{{ PHP_BASENAME }}.tar.gz"
     dest: "{{ SRC_DIR }}"
     copy: no
-    group: root
-    owner: root
-    mode: "0755"
 
-- name: Check php compilation flangs
+- name: Check php compilation flags
   template:
     src: .php_compilation_flags.j2
-    dest: "{{ PHP_SRC_DIR }}/.php_compilation_flags"
+    dest: "{{ SRC_DIR }}/{{ PHP_BASENAME }}/.php_compilation_flags"
   register: php_compilation_flags
 
 - name: Run php configure script
   command: "./configure {{ PHP_CONFIGURE_OPTIONS | join(' ') }}"
   args:
-    chdir: "{{ PHP_SRC_DIR }}"
+    chdir: "{{ SRC_DIR }}/{{ PHP_BASENAME }}"
   when: php_compilation_flags.changed
 
 - name: Build php
   make:
-    chdir: "{{ PHP_SRC_DIR }}"
+    chdir: "{{ SRC_DIR }}/{{ PHP_BASENAME }}"
     target: all
   when: php_compilation_flags.changed
   register: php_build
 
 - name: Install php
   make:
-    chdir: "{{ PHP_SRC_DIR }}"
+    chdir: "{{ SRC_DIR }}/{{ PHP_BASENAME }}"
     target: install
   when: php_build.changed
 
 - name: Set php.ini
   template:
     src: php.ini-development.j2
-    dest: /usr/local/php/lib/php.ini
+    dest: "{{ PHP_PREFIX }}/lib/php.ini"
 
 - name: Create php bin entries symlink
   file:
@@ -59,5 +53,3 @@
     dest: "{{ SBIN_DIR }}/{{ item }}"
     state: link
   with_items: "{{ PHP_SBIN_ENTRIES }}"
-
-

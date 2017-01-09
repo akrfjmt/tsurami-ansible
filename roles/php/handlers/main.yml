@@ -1,5 +1,5 @@
 ---
-- name: Restart nginx
+- name: Restart php-fpm
   systemd:
     state: restarted
     daemon_reload: yes

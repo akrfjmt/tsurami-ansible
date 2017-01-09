@@ -1,5 +1,5 @@
 ---
-# 参照: http://dev.mysql.com/doc/refman/5.7/en/binary-installation.html
+# see: http://dev.mysql.com/doc/refman/5.7/en/binary-installation.html
 
 - name: Install mysql dependency packages
   apt:
@@ -22,89 +22,23 @@
 
 - name: Upload mysql tarball
   synchronize:
-    src: "{{ role_path }}/files/{{ MYSQL_BASENAME }}.tar.gz"
+    src: "{{ MYSQL_BASENAME }}.tar.gz"
     dest: "{{ SRC_DIR }}/{{ MYSQL_BASENAME }}.tar.gz"
-
-## 本当はこう書きたいが、Ansible 2.2.0.0ではMemoryErrorになる。
-#- name: Copy mysql tarball
-#  copy:
-#    src: "{{ MYSQL_BASENAME }}.tar.gz"
-#    dest: "{{ SRC_DIR }}"
-#    mode: "0644"
-#    owner: root
-#    group: root
-
-## 直接ダウンロードする場合
-#- name: Download mysql tarball from jaist
-#  get_url:
-#    url: "ftp://ftp.jaist.ac.jp/pub/mysql/Downloads/MySQL-5.7/{{ MYSQL_BASENAME }}.tar.gz"
-#    dest: "{{ SRC_DIR }}/{{ MYSQL_BASENAME }}.tar.gz"
 
 - name: Unarchive mysql tarball
   unarchive:
     remote_src: yes
     src: "{{ SRC_DIR }}/{{ MYSQL_BASENAME }}.tar.gz"
-    dest: "{{ INSTALL_DIR }}"
-    creates: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
+    dest: "{{ PREFIX }}"
+    creates: "{{ PREFIX }}/{{ MYSQL_BASENAME }}"
   register: mysql_unarchive_flags
-
-- name: Create mysql-files directory
-  file:
-    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}/mysql-files"
-    mode: "0750"
-    state: directory
-  when: mysql_unarchive_flags.changed
-
-- name: Change mysql directory filemode
-  file:
-    recurse: yes
-    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
-    owner: "{{ MYSQL_USER }}"
-    group: "{{ MYSQL_GROUP }}"
-  when: mysql_unarchive_flags.changed
-
-- name: Initialize mysql
-  command: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}/bin/mysqld --initialize-insecure --user=mysql"
-  when: mysql_unarchive_flags.changed
-
-- name: Execute mysql_ssl_rsa_setup
-  command: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}/bin/mysql_ssl_rsa_setup"
-  when: mysql_unarchive_flags.changed
-
-- name: Change mysql directory owner to root
-  file:
-    recurse: yes
-    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
-    owner: root
-    group: root
-  when: mysql_unarchive_flags.changed
-
-- name: Change mysql directory owner to mysql
-  file:
-    recurse: yes
-    path: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}/{{ item }}"
-    owner: "{{ MYSQL_USER }}"
-    group: "{{ MYSQL_GROUP }}"
-  with_items:
-    - data
-    - mysql-files
-  when: mysql_unarchive_flags.changed
-
-- name: Copy mysqld.service for systemd
-  copy:
-    src: mysqld.service
-    dest: /etc/systemd/system
-    owner: root
-    group: root
-    mode: 644
-  when: mysql_unarchive_flags.changed
+  notify: Restart mysqld
 
 - name: Create mysql directory symlink
   file:
-    src: "{{ INSTALL_DIR }}/{{ MYSQL_BASENAME }}"
+    src: "{{ PREFIX }}/{{ MYSQL_BASENAME }}"
     dest: "{{ MYSQL_PREFIX }}"
     state: link
-  when: mysql_unarchive_flags.changed
 
 - name: Create mysql bin entries symlink
   file:
@@ -112,4 +46,51 @@
     dest: "{{ BIN_DIR }}/{{ item }}"
     state: link
   with_items: "{{ MYSQL_BIN_ENTRIES }}"
+
+- name: Set mysqld.service for systemd
+  template:
+    src: mysqld.service.j2
+    dest: /lib/systemd/system/mysqld.service
+  notify: Restart mysqld
+
+- name: Create mysql-files directory
+  file:
+    path: "{{ PREFIX }}/{{ MYSQL_BASENAME }}/mysql-files"
+    mode: "0750"
+    state: directory
+  when: mysql_unarchive_flags.changed
+
+- name: Change mysql directory filemode
+  file:
+    recurse: yes
+    path: "{{ PREFIX }}/{{ MYSQL_BASENAME }}"
+    owner: "{{ MYSQL_USER }}"
+    group: "{{ MYSQL_GROUP }}"
+  when: mysql_unarchive_flags.changed
+
+- name: Initialize mysql
+  command: "{{ PREFIX }}/{{ MYSQL_BASENAME }}/bin/mysqld --initialize-insecure --user=mysql"
+  when: mysql_unarchive_flags.changed
+
+- name: Execute mysql_ssl_rsa_setup
+  command: "{{ PREFIX }}/{{ MYSQL_BASENAME }}/bin/mysql_ssl_rsa_setup"
+  when: mysql_unarchive_flags.changed
+
+- name: Change mysql directory owner to root
+  file:
+    recurse: yes
+    path: "{{ PREFIX }}/{{ MYSQL_BASENAME }}"
+    owner: root
+    group: root
+  when: mysql_unarchive_flags.changed
+
+- name: Change mysql directory owner to mysql
+  file:
+    recurse: yes
+    path: "{{ PREFIX }}/{{ MYSQL_BASENAME }}/{{ item }}"
+    owner: "{{ MYSQL_USER }}"
+    group: "{{ MYSQL_GROUP }}"
+  with_items:
+    - data
+    - mysql-files
   when: mysql_unarchive_flags.changed

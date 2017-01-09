@@ -1,6 +1,7 @@
-PHP_VERSION: php-7.1.0
-PHP_SRC_DIR: "{{ SRC_DIR }}/{{ PHP_VERSION }}"
-PHP_PREFIX: "{{ INSTALL_DIR }}/php"
+---
+PHP_BASENAME: php-7.1.0
+
+PHP_PREFIX: "{{ PREFIX }}/php"
 
 PHP_DEPENDENCY_PACKAGES_APT:
   - libxml2-dev

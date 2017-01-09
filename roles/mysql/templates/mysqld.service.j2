@@ -5,10 +5,10 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/mysql/bin/mysqld --user=mysql
+ExecStart={{ MYSQL_PREFIX }}/bin/mysqld --user={{ MYSQL_USER }}
 TimeoutSec=300
-User=mysql
-Group=mysql
+User={{ MYSQL_USER }}
+Group={{ MYSQL_GROUP }}
 
 [Install]
 WantedBy=multi-user.target

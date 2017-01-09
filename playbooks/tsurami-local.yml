@@ -6,6 +6,6 @@
     - ../group_vars/all.yml
     - ../group_vars/accounts.yml
   roles:
-#    - ../roles/nginx
+    - ../roles/nginx
     - ../roles/mysql
-#    - ../roles/php
+    - ../roles/php

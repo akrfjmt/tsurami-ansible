@@ -1,6 +1,6 @@
 ---
-- name: Restart nginx
+- name: Restart mysqld
   systemd:
     state: restarted
     daemon_reload: yes
-    name: nginx
+    name: mysqld

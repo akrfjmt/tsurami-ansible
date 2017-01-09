@@ -1,0 +1,8 @@
+---
+- name: Copy composer
+  copy:
+    src: composer.phar
+    dest: "{{ BIN_DIR }}/composer"
+    owner: root
+    group: root
+    mode: "0755"

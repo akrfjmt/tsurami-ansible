@@ -3,7 +3,7 @@
   apt:
     name: "{{ item }}"
     state: present
-  with_items: "{{ NGINX_DEPENDENCY_PACKAGES_APT }}"
+  with_items: "{{ NGINX_DEPENDENCY_PACKAGES }}"
 
 - include: ../../common/tasks/create_nginx_user.yml
 
@@ -11,72 +11,60 @@
   file:
     path: "{{ NGINX_TEMP_DIR }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Create nginx log directory
   file:
     path: "{{ NGINX_LOG_DIR }}"
     state: directory
-    owner: root
-    group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Copy nginx tarball
   copy:
-    src: "{{ NGINX_VERSION }}.tar.gz"
+    src: "{{ NGINX_BASENAME }}.tar.gz"
     dest: "{{ SRC_DIR }}"
-    owner: root
-    group: root
-    mode: "0644"
 
 - name: Decompress nginx tarball
   unarchive:
-    src: "{{ SRC_DIR }}/{{ NGINX_VERSION }}.tar.gz"
     remote_src: yes
+    src: "{{ SRC_DIR }}/{{ NGINX_BASENAME }}.tar.gz"
     dest: "{{ SRC_DIR }}"
-    group: root
-    owner: root
-    mode: "0755"
+    creates: "{{ SRC_DIR }}/{{ NGINX_BASENAME }}"
 
-- name: Check nginx compilation flangs
+- name: Check nginx compilation flags
   template:
     src: .nginx_compilation_flags.j2
-    dest: "{{ NGINX_SRC_DIR }}/.nginx_compilation_flags"
+    dest: "{{ SRC_DIR }}/{{ NGINX_BASENAME }}/.nginx_compilation_flags"
   register: nginx_compilation_flags
 
 - name: Run nginx configure script
   command: "./configure {{ NGINX_CONFIGURE_OPTIONS | join(' ') }}"
   args:
-    chdir: "{{ NGINX_SRC_DIR }}"
+    chdir: "{{ SRC_DIR }}/{{ NGINX_BASENAME }}"
   when: nginx_compilation_flags.changed
 
 - name: Build nginx
   make:
-    chdir: "{{ NGINX_SRC_DIR }}"
+    chdir: "{{ SRC_DIR }}/{{ NGINX_BASENAME }}"
     target: build
+  when: nginx_compilation_flags.changed
   register: nginx_build
 
 - name: Install nginx
   make:
-    chdir: "{{ NGINX_SRC_DIR }}"
+    chdir: "{{ SRC_DIR }}/{{ NGINX_BASENAME }}"
     target: install
   when: nginx_build.changed
-  notify: restart nginx
+  notify: Restart nginx
 
 - name: Set nginx symbolic link
   file:
-    src: /usr/local/nginx/sbin/nginx
+    src: "{{ NGINX_PREFIX }}/sbin/nginx"
     dest: /usr/sbin/nginx
-    owner: root
-    group: root
     state: link
 
-- name: Copy nginx systemd script
-  copy:
-    src: nginx.service
-    dest: /lib/systemd/system
-    owner: root
-    group: root
-    mode: 644
+- name: Set nginx.service for systemd
+  template:
+    src: nginx.service.j2
+    dest: /lib/systemd/system/nginx.service
+  notify: Restart nginx

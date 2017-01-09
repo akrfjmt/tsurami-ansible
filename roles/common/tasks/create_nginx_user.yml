@@ -9,5 +9,3 @@
     name: "{{ NGINX_USER }}"
     uid: "{{ NGINX_USER_UID }}"
     group: "{{ NGINX_USER }}"
-    system: yes
-    shell: /sbin/nologin

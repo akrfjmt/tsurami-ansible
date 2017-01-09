@@ -5,5 +5,16 @@
   template:
     src: php-fpm.service.j2
     dest: /etc/systemd/system/php-fpm.service
-  register: nginx_compilation_flags
+  notify: Restart mysqld
 
+- name: Set php-fpm.conf
+  template:
+    src: php-fpm.conf.j2
+    dest: "{{ PHP_PREFIX }}/etc/php-fpm.conf"
+  notify: Restart mysqld
+
+- name: Set php-fpm's www.conf
+  template:
+    src: www.conf.j2
+    dest: "{{ PHP_PREFIX }}/etc/php-fpm.d/php-fpm.conf"
+  notify: Restart mysqld

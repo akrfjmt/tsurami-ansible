@@ -1,3 +1,4 @@
 ---
 - include: install.yml
 - include: php-fpm.yml
+- include: composer.yml
